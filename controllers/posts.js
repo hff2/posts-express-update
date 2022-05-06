@@ -5,7 +5,14 @@ const posts = {
     /* GET */
     async getPosts(req, res, next) {
         try {
-            const allPosts = await Post.find();
+            const timeSort = req.query.timeSort == "asc" ? "createdAt" : "-createdAt"
+            const q = req.query.keyword !== undefined ? { "content": new RegExp(req.query.keyword) } : {};
+            const allPosts = await Post
+                .find(q)
+                .populate({
+                    path: 'user',
+                    select: 'name photo'
+                }).sort(timeSort);
             successHandle(res, 200, allPosts)
         }
         catch (e) {
@@ -17,16 +24,17 @@ const posts = {
     /* POST */
     async createPosts(req, res, next) {
         try {
-            const { name, content } = req.body
+            const { user, content, image } = req.body
 
-            if (!content || !name) {
+            if (!content || !user) {
                 errorHandle(res, 400, '資料不齊全')
                 return
             }
             const newPost = await Post.create(
                 {
-                    name,
-                    content
+                    user,
+                    content,
+                    image
                 }
             );
             successHandle(res, 200, newPost)
