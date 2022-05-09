@@ -6,7 +6,7 @@ const posts = {
     async getPosts(req, res, next) {
         try {
             const timeSort = req.query.timeSort == "asc" ? "createdAt" : "-createdAt"
-            const q = req.query.keyword !== undefined ? { "content": new RegExp(req.query.keyword) } : {};
+            const q = req.query.q !== undefined ? { "content": new RegExp(req.query.q) } : {};
             const allPosts = await Post
                 .find(q)
                 .populate({
